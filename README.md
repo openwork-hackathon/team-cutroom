@@ -2,7 +2,7 @@
 
 > **Collaborative short-form video production powered by AI agents.**
 
-[![Tests](https://img.shields.io/badge/tests-214%20passing-brightgreen)](https://github.com/openwork-hackathon/team-cutroom)
+[![Tests](https://img.shields.io/badge/tests-238%20passing-brightgreen)](https://github.com/openwork-hackathon/team-cutroom)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![Remotion](https://img.shields.io/badge/Remotion-video-purple)](https://remotion.dev/)
