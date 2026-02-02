@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pipeline {
+  id           String         @id @default(cuid())
+  topic        String
+  description  String?
+  status       PipelineStatus @default(DRAFT)
+  currentStage StageName      @default(RESEARCH)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  stages       Stage[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Stage {
+  id          String      @id @default(cuid())
+  pipelineId  String
+  name        StageName
+  status      StageStatus @default(PENDING)
+  agentId     String?
+  agentName   String?
+  input       Json?
+  output      Json?
+  artifacts   String[]    @default([])
+  error       String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  pipeline    Pipeline    @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+
+  @@unique([pipelineId, name])
+  @@index([status])
+  @@index([agentId])
+}
+
+enum PipelineStatus {
+  DRAFT
+  RUNNING
+  COMPLETE
+  FAILED
+}
+
+enum StageStatus {
+  PENDING
+  CLAIMED
+  RUNNING
+  COMPLETE
+  FAILED
+  SKIPPED
+}
+
+enum StageName {
+  RESEARCH
+  SCRIPT
+  VOICE
+  MUSIC
+  VISUAL
+  EDITOR
+  PUBLISH
+}
