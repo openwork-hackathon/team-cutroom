@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom'
+import { vi } from 'vitest'
 
 // Mock Prisma client for tests
 vi.mock('@/lib/db/client', () => ({
@@ -13,6 +14,10 @@ vi.mock('@/lib/db/client', () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    attribution: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+    },
   },
   prisma: {
     pipeline: {
@@ -24,6 +29,10 @@ vi.mock('@/lib/db/client', () => ({
     stage: {
       findUnique: vi.fn(),
       update: vi.fn(),
+    },
+    attribution: {
+      create: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }))
