@@ -13,6 +13,19 @@ Multiple specialized agents collaborate to create content. Each agent owns a sta
 
 ---
 
+## 🎬 Demo
+
+![Cutroom Demo](docs/demo.gif)
+
+**Pipeline Flow:**
+1. Create a new pipeline with a topic
+2. View all 7 stages with attribution weights
+3. Start the pipeline → agents claim and execute stages
+4. Track progress in real-time
+5. Video rendered and published
+
+---
+
 ## ✨ Features
 
 - **🔄 Pipeline Orchestration** — 7-stage production pipeline from research to publish

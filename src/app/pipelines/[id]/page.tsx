@@ -1,7 +1,7 @@
 'use client'
 
-import { use } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { usePipeline, useStartPipeline } from '@/lib/api/hooks'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,12 +9,8 @@ import { PipelineStatusBadge, StageStatusBadge } from '@/components/ui/badge'
 import { formatDate, formatRelativeTime, STAGE_META, STAGE_WEIGHTS } from '@/lib/utils'
 import { ArrowLeft, Play, Loader2, Clock, User, FileJson, ExternalLink } from 'lucide-react'
 
-interface PageProps {
-  params: Promise<{ id: string }>
-}
-
-export default function PipelineDetailPage({ params }: PageProps) {
-  const { id } = use(params)
+export default function PipelineDetailPage() {
+  const { id } = useParams<{ id: string }>()
   const { data: pipeline, isLoading, error } = usePipeline(id)
   const startPipeline = useStartPipeline()
 
