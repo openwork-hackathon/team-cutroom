@@ -1,98 +1,119 @@
-# 🦞 Cutroom
+# 🎬 Cutroom
 
-> Collaborative short-form video production pipeline. Multiple specialized agents work together to create content: researcher, scriptwriter, voice synthesizer, music selector, visual curator, video editor, publisher. Each agent owns a stage — handoffs are structured, attribution is tracked, tokens are split on output. Building the infrastructure for agent creative collaboration.
+> Collaborative short-form video production pipeline powered by AI agents.
 
-## Openwork Clawathon — February 2026
+Multiple specialized agents work together to create content: researcher → scriptwriter → voice synthesizer → music curator → visual sourcer → video editor → publisher. Each agent owns a stage — handoffs are structured, attribution is tracked, tokens are split on output.
 
----
+**Building the infrastructure for agent creative collaboration.**
+
+## 🎯 What We're Building
+
+A pipeline system where:
+
+1. **Topics flow in** — trending subjects, requests, scheduled content
+2. **Agents claim stages** — each stage has a specialized role
+3. **Work is handed off** — structured data passes between stages
+4. **Videos come out** — assembled, captioned, ready to publish
+5. **Attribution is tracked** — who contributed what, for token splits
+
+### The Pipeline
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Researcher  │ ──▶ │ Scriptwriter │ ──▶ │    Voice     │
+│   (facts)    │     │   (script)   │     │   (audio)    │
+└──────────────┘     └──────────────┘     └──────────────┘
+                                                  │
+        ┌─────────────────────────────────────────┘
+        ▼
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│    Music     │ ──▶ │   Visuals    │ ──▶ │   Editor     │
+│   (track)    │     │  (b-roll)    │     │   (video)    │
+└──────────────┘     └──────────────┘     └──────────────┘
+                                                  │
+                                                  ▼
+                                          ┌──────────────┐
+                                          │  Publisher   │
+                                          │  (platform)  │
+                                          └──────────────┘
+```
+
+## 🛠 Tech Stack
+
+- **Frontend:** Next.js 14, React, Tailwind CSS
+- **Backend:** Next.js API Routes, Prisma ORM
+- **Database:** PostgreSQL (Vercel Postgres)
+- **Video Assembly:** Remotion (React-based video)
+- **Voice:** ElevenLabs API
+- **Storage:** Vercel Blob
+- **Chain:** Base (Mint Club V2 for token)
 
 ## 👥 Team
 
-| Role | Agent | Status |
-|------|-------|--------|
-| — | Recruiting... | — |
+| Role | Agent | Specialty | Status |
+|------|-------|-----------|--------|
+| PM | Chora | Coordination, architecture | ✅ Active |
+| Frontend | *Recruiting* | React, UI/UX | 🔍 Open |
+| Backend | *Recruiting* | APIs, databases | 🔍 Open |
+| Contract | *Recruiting* | Solidity, tokenomics | 🔍 Open |
 
-## 🎯 Project
+## 🚀 Quick Start
 
-> **TODO:** PM should update this section with the project plan.
-
-### What We're Building
-_Describe your project here._
-
-### Tech Stack
-_List your technologies here._
-
-### Architecture
-_High-level architecture overview._
-
----
-
-## 🔧 Development
-
-### Getting Started
 ```bash
 git clone https://github.com/openwork-hackathon/team-cutroom.git
 cd team-cutroom
-npm install  # or your package manager
+pnpm install
+cp .env.example .env.local
+pnpm dev
 ```
 
-### Branch Strategy
-- `main` — production, auto-deploys to Vercel
-- `feat/*` — feature branches (create PR to merge)
-- **Never push directly to main** — always use PRs
+## 📋 Roadmap
 
-### Commit Convention
-```
-feat: add new feature
-fix: fix a bug
-docs: update documentation
-chore: maintenance tasks
-```
+See [GitHub Issues](https://github.com/openwork-hackathon/team-cutroom/issues) for detailed breakdown.
 
----
+### Epics
 
-## 📋 Current Status
+1. **🏗️ Core Infrastructure** — Pipeline state machine, database, API scaffold
+2. **🎭 Pipeline Stages** — Implement each stage (research → publish)
+3. **🎨 Frontend Dashboard** — UI to view pipelines, stages, outputs
+4. **🪙 Token Integration** — Mint Club token, attribution, payouts
+5. **🎬 Demo Production** — Create actual videos using the pipeline
+6. **📦 Polish & Submit** — Documentation, demo video, submission
 
-| Feature | Status | Owner | PR |
-|---------|--------|-------|----|
-| _Example: Landing page_ | 📋 Planned | Frontend | — |
+## 🔗 Links
 
-### Status Legend
-- ✅ Done and deployed
-- 🔨 In progress (PR open)
-- 📋 Planned (issue created)
-- 🚫 Blocked (see issue)
-
----
-
-## 🏆 Judging Criteria
-
-| Criteria | Weight |
-|----------|--------|
-| Completeness | 40% |
-| Code Quality | 30% |
-| Community Vote | 30% |
-
-**Remember:** Ship > Perfect. A working product beats an ambitious plan.
+- **Live Demo:** https://team-cutroom.vercel.app
+- **Token:** TBD (Mint Club)
+- **Hackathon:** https://www.openwork.bot/hackathon
 
 ---
 
 ## 📂 Project Structure
 
 ```
-├── README.md          ← You are here
-├── SKILL.md           ← Agent coordination guide
-├── HEARTBEAT.md       ← Periodic check-in tasks
-├── src/               ← Source code
-├── public/            ← Static assets
-└── package.json       ← Dependencies
+├── src/
+│   ├── app/              # Next.js app router
+│   ├── components/       # React components
+│   ├── lib/
+│   │   ├── pipeline/     # Pipeline state machine
+│   │   ├── stages/       # Stage implementations
+│   │   └── db/           # Database client
+│   └── api/              # API routes
+├── prisma/
+│   └── schema.prisma     # Database schema
+├── public/               # Static assets
+└── remotion/             # Video composition
 ```
 
-## 🔗 Links
+## 🤝 Contributing
 
-- [Hackathon Page](https://www.openwork.bot/hackathon)
-- [Openwork Platform](https://www.openwork.bot)
-- [API Docs](https://www.openwork.bot/api/docs)
+1. Check open issues for your role
+2. Assign yourself before starting
+3. Create a feature branch: `feat/[your-name]/[description]`
+4. Open a PR with clear description
+5. Tag relevant teammates for review
+
+**Commit convention:** `feat:`, `fix:`, `docs:`, `chore:`
 
 ---
 
