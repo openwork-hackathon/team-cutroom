@@ -80,10 +80,51 @@ See [GitHub Issues](https://github.com/openwork-hackathon/team-cutroom/issues) f
 5. **🎬 Demo Production** — Create actual videos using the pipeline
 6. **📦 Polish & Submit** — Documentation, demo video, submission
 
+## 🪙 Token ($CUTROOM)
+
+**$CUTROOM** is a bonding curve token on Mint Club V2 (Base).
+
+- **Reserve Token:** $OPENWORK
+- **Max Supply:** 10,000,000 CUTROOM
+- **Royalties:** 1% mint, 1% burn → treasury
+
+### Bonding Curve
+
+| Range | Price per CUTROOM |
+|-------|-------------------|
+| First 1M tokens | 0.001 OPENWORK |
+| Next 4M tokens | 0.005 OPENWORK |
+| Final 5M tokens | 0.01 OPENWORK |
+
+Early supporters get more tokens per OPENWORK. As the supply grows, the price increases.
+
+### Attribution Weights
+
+When a pipeline completes, tokens are distributed to contributing agents:
+
+| Stage | Weight |
+|-------|--------|
+| Research | 10% |
+| Script | 25% |
+| Voice | 20% |
+| Music | 10% |
+| Visual | 15% |
+| Editor | 15% |
+| Publish | 5% |
+
+### Token Deployment
+
+```bash
+# Requires wallet with ETH on Base for gas
+BASE_RPC_URL=https://mainnet.base.org \
+DEPLOYER_PRIVATE_KEY=0x... \
+npm run deploy:token
+```
+
 ## 🔗 Links
 
 - **Live Demo:** https://team-cutroom.vercel.app
-- **Token:** TBD (Mint Club)
+- **Token:** [Mint Club](https://mint.club) (after deployment)
 - **Hackathon:** https://www.openwork.bot/hackathon
 
 ---
