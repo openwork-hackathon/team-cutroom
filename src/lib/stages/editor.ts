@@ -10,6 +10,13 @@ import {
   VisualOutput,
   ScriptOutput,
 } from "./types"
+import { 
+  templateToRemotionProps, 
+  getBackgroundUrl,
+  calculateDurationInFrames,
+  getVideoTemplate,
+  RemotionTemplateProps,
+} from "@/lib/templates"
 
 // Input schema - expects voice and visual outputs from previous stages
 const EditorInputSchema = z.object({
@@ -26,6 +33,9 @@ const EditorInputSchema = z.object({
     height: z.number(),
     fps: z.number(),
   }).optional(),
+  // Template-based inputs
+  templateId: z.string().optional(),
+  template: z.any().optional(), // Pre-loaded template config from pipeline metadata
 })
 
 const DEFAULT_FORMAT: VideoFormat = {
@@ -61,6 +71,18 @@ export const editorStage: StageHandler = {
       const script = input.script as ScriptOutput | undefined
       
       const format = input.format || DEFAULT_FORMAT
+      
+      // Load template if specified
+      let templateProps: RemotionTemplateProps | undefined
+      let backgroundUrl: string | undefined
+      
+      if (input.templateId || input.template) {
+        const template = input.template || getVideoTemplate(input.templateId)
+        if (template) {
+          templateProps = templateToRemotionProps(template)
+          backgroundUrl = getBackgroundUrl(template.visuals)
+        }
+      }
 
       // Validate we have required inputs
       if (!voice?.audioUrl) {
@@ -75,11 +97,11 @@ export const editorStage: StageHandler = {
 
       // Generate video composition
       // In production: Use Remotion or ffmpeg
-      const composition = generateComposition(voice, visual, format, duration)
+      const composition = generateComposition(voice, visual, format, duration, templateProps)
 
       // For MVP: Return mock video URL
       // In production: Actually render the video
-      const videoUrl = await renderVideo(composition, context.pipelineId)
+      const videoUrl = await renderVideo(composition, context.pipelineId, templateProps)
       const thumbnailUrl = await generateThumbnail(visual.clips[0]?.url, context.pipelineId)
 
       const renderTime = (Date.now() - startTime) / 1000
@@ -104,6 +126,8 @@ export const editorStage: StageHandler = {
             clipCount: visual.clips.length,
             overlayCount: visual.overlays.length,
             hasAudio: true,
+            templateId: input.templateId,
+            templateStyle: templateProps?.visualStyle,
           },
           renderTime,
         },
@@ -128,13 +152,15 @@ interface VideoComposition {
     duration: number
     properties?: Record<string, unknown>
   }[]
+  templateProps?: RemotionTemplateProps
 }
 
 function generateComposition(
   voice: VoiceOutput,
   visual: VisualOutput,
   format: VideoFormat,
-  duration: number
+  duration: number,
+  templateProps?: RemotionTemplateProps
 ): VideoComposition {
   const tracks: VideoComposition["tracks"] = []
 
@@ -174,18 +200,37 @@ function generateComposition(
     format,
     duration,
     tracks,
+    templateProps, // Include template config for renderer
   }
 }
 
-async function renderVideo(composition: VideoComposition, pipelineId: string): Promise<string> {
+async function renderVideo(
+  composition: VideoComposition, 
+  pipelineId: string,
+  templateProps?: RemotionTemplateProps
+): Promise<string> {
   // TODO: Implement actual video rendering
   // Options:
   // 1. Remotion (React-based video rendering)
   // 2. FFmpeg via serverless function
   // 3. External API like Shotstack, Creatomate
   
-  // For MVP: Return placeholder URL
-  return `https://placeholder.blob.vercel.com/video/${pipelineId}/final.mp4`
+  // Determine composition ID based on template
+  let compositionId = 'CutroomVideo'
+  if (templateProps) {
+    if (templateProps.isDialog) {
+      compositionId = 'DialogExplainer'
+    } else if (templateProps.visualStyle === 'gameplay') {
+      compositionId = 'RedditMinecraft'
+    } else if (templateProps.visualStyle === 'gradient') {
+      compositionId = 'BedtimeStory'
+    } else {
+      compositionId = 'TemplateVideo'
+    }
+  }
+  
+  // For MVP: Return placeholder URL with template info
+  return `https://placeholder.blob.vercel.com/video/${pipelineId}/${compositionId}/final.mp4`
 }
 
 async function generateThumbnail(clipUrl: string | undefined, pipelineId: string): Promise<string> {
