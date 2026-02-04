@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node
+#!/usr/bin/env npx tsx
 
 /**
  * Demo Mode Pipeline Runner
@@ -7,7 +7,7 @@
  * the system flow. Outputs a markdown file suitable for documentation.
  * 
  * Usage:
- *   npx ts-node scripts/demo-run.ts
+ *   npx tsx scripts/demo-run.ts
  */
 
 const TOPIC = 'What are AI Agents?'

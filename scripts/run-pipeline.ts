@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node
+#!/usr/bin/env npx tsx
 
 /**
  * End-to-End Pipeline Runner
@@ -6,8 +6,8 @@
  * Runs a complete Cutroom pipeline from topic to final output.
  * 
  * Usage:
- *   npx ts-node scripts/run-pipeline.ts "Top 5 AI tools for developers"
- *   npx ts-node scripts/run-pipeline.ts --topic "What are AI agents?" --skip-publish
+ *   npx tsx scripts/run-pipeline.ts "Top 5 AI tools for developers"
+ *   npx tsx scripts/run-pipeline.ts --topic "What are AI agents?" --skip-publish
  */
 
 // Load environment variables from .env.local
@@ -43,8 +43,8 @@ function parseArgs(): RunOptions {
   const args = process.argv.slice(2)
   
   if (args.length === 0) {
-    console.error('Usage: npx ts-node scripts/run-pipeline.ts "Your topic here"')
-    console.error('       npx ts-node scripts/run-pipeline.ts --topic "Topic" --skip-publish')
+    console.error('Usage: npx tsx scripts/run-pipeline.ts "Your topic here"')
+    console.error('       npx tsx scripts/run-pipeline.ts --topic "Topic" --skip-publish')
     process.exit(1)
   }
   

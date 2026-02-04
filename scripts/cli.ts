@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node
+#!/usr/bin/env npx tsx
 
 /**
  * Cutroom CLI
@@ -6,10 +6,10 @@
  * Simple command-line interface for interacting with Cutroom.
  * 
  * Usage:
- *   npx ts-node scripts/cli.ts status
- *   npx ts-node scripts/cli.ts list
- *   npx ts-node scripts/cli.ts create "Topic here"
- *   npx ts-node scripts/cli.ts run "Topic here"
+ *   npx tsx scripts/cli.ts status
+ *   npx tsx scripts/cli.ts list
+ *   npx tsx scripts/cli.ts create "Topic here"
+ *   npx tsx scripts/cli.ts run "Topic here"
  */
 
 const API_URL = process.env.API_URL || 'http://localhost:3000/api'
@@ -104,7 +104,7 @@ async function create(topic: string) {
     console.log(`✅ Created: ${pipeline.id}`)
     console.log(`   Status: ${pipeline.status}`)
     console.log('')
-    console.log('To start: npx ts-node scripts/cli.ts start ' + pipeline.id)
+    console.log('To start: npx tsx scripts/cli.ts start ' + pipeline.id)
   } catch (error) {
     console.error('Error:', (error as Error).message)
   }
@@ -180,6 +180,6 @@ switch (command) {
     console.log('  run       Run full pipeline (local)')
     console.log('')
     console.log('Examples:')
-    console.log('  npx ts-node scripts/cli.ts status')
-    console.log('  npx ts-node scripts/cli.ts create "What are AI agents?"')
+    console.log('  npx tsx scripts/cli.ts status')
+    console.log('  npx tsx scripts/cli.ts create "What are AI agents?"')
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node
+#!/usr/bin/env npx tsx
 
 /**
  * Deploy $CUTROOM token on Mint Club V2 (Base)
@@ -8,7 +8,7 @@
  * - DEPLOYER_PRIVATE_KEY (wallet with ETH for gas)
  * 
  * Usage:
- *   BASE_RPC_URL=... DEPLOYER_PRIVATE_KEY=0x... npx ts-node scripts/deploy-token.ts
+ *   BASE_RPC_URL=... DEPLOYER_PRIVATE_KEY=0x... npx tsx scripts/deploy-token.ts
  */
 
 import { ethers } from 'ethers'

@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node
+#!/usr/bin/env npx tsx
 
 /**
  * Seed Database Script
@@ -6,8 +6,8 @@
  * Populates the database with sample pipelines for testing and demos.
  * 
  * Usage:
- *   npx ts-node scripts/seed-db.ts
- *   npx ts-node scripts/seed-db.ts --clean  # Delete existing data first
+ *   npx tsx scripts/seed-db.ts
+ *   npx tsx scripts/seed-db.ts --clean  # Delete existing data first
  */
 
 import prisma from '../src/lib/db/client'

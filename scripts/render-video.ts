@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node
+#!/usr/bin/env npx tsx
 
 /**
  * Render Video Script
@@ -6,8 +6,8 @@
  * Takes pipeline output and renders a video using Remotion.
  * 
  * Usage:
- *   npx ts-node scripts/render-video.ts --input pipeline-output.json
- *   npx ts-node scripts/render-video.ts --input pipeline-output.json --output output.mp4
+ *   npx tsx scripts/render-video.ts --input pipeline-output.json
+ *   npx tsx scripts/render-video.ts --input pipeline-output.json --output output.mp4
  */
 
 import { bundle } from '@remotion/bundler'
