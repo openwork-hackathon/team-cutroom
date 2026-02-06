@@ -4,7 +4,7 @@
  * Pre-configured voice settings for different content styles.
  */
 
-import { VoicePreset } from './types'
+import { VoicePreset } from '../types'
 
 export const VOICE_PRESETS: Record<string, VoicePreset> = {
   // ========================================
