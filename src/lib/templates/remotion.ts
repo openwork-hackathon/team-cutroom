@@ -161,11 +161,13 @@ export function getBackgroundUrl(visuals: VideoTemplate['visuals']): string | un
     // Return a placeholder - actual URL would be fetched from library
     return `/gameplay/${visuals.background.game}.mp4`
   }
-  if (visuals.background.type === 'video' && visuals.background.url) {
-    return visuals.background.url
+  if (visuals.background.type === 'video') {
+    // Use first source from video sources
+    return visuals.background.sources?.[0]
   }
-  if (visuals.background.type === 'image' && visuals.background.url) {
-    return visuals.background.url
+  if (visuals.background.type === 'image') {
+    // Use color for static images (placeholder)
+    return visuals.background.color
   }
   return undefined
 }
