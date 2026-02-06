@@ -50,14 +50,16 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
 
   if (visuals.background.type === 'gameplay') {
     visualStyle = 'gameplay'
-  } else if (visuals.background.type === 'video') {
+  } else if (visuals.background.type === 'video' || visuals.background.type === 'broll') {
     visualStyle = 'broll'
-  } else if (visuals.background.type === 'image' || visuals.background.type === 'generated') {
+  } else if (visuals.background.type === 'static') {
     visualStyle = 'static'
     backgroundColor = visuals.background.color
   } else if (visuals.background.type === 'gradient') {
     visualStyle = 'gradient'
     gradientColors = visuals.background.colors as [string, string]
+  } else if (visuals.background.type === 'particles') {
+    visualStyle = 'static' // fallback for particles
   }
 
   // Determine caption style
