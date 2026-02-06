@@ -71,13 +71,12 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
   let captionFont: string | undefined
 
   if (layout.captions) {
-    captionStyle = layout.captions.style === 'bold' ? 'bold' :
-                   layout.captions.style === 'minimal' ? 'subtle' :
-                   layout.captions.style === 'karaoke' ? 'karaoke' : 'bold'
+    // Style is now an object with font, fontSize, color, etc.
+    captionStyle = 'bold' // Default style
     captionPosition = layout.captions.position
-    captionColor = layout.captions.textColor
-    captionStroke = layout.captions.strokeColor
-    captionFont = layout.captions.fontFamily
+    captionColor = layout.captions.style?.color
+    captionStroke = layout.captions.style?.stroke?.color
+    captionFont = layout.captions.style?.font
     captionAnimation = layout.captions.animation === 'word-by-word' ? 'word-by-word' :
                        layout.captions.animation === 'typewriter' ? 'typewriter' : 'fade'
   }
