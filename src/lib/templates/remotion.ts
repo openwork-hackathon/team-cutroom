@@ -112,10 +112,8 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
                         wPos === 'top-right' ? 'top-right' :
                         wPos === 'bottom-left' ? 'bottom-left' :
                         wPos === 'bottom-right' ? 'bottom-right' : 'bottom-right'
-    showEndCard = layout.branding.showEndCard
-    ctaText = layout.branding.ctaStyle === 'text' && structure.cta?.text
-      ? structure.cta.text
-      : undefined
+    showEndCard = layout.branding.endCard
+    ctaText = layout.branding.cta
   }
 
   // Color grading
