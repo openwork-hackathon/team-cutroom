@@ -46,7 +46,7 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
   let visualStyle: RemotionTemplateProps['visualStyle'] = 'static'
   let backgroundColor: string | undefined
   let gradientColors: [string, string] | undefined
-  const backgroundOpacity: number | undefined = visuals.backgroundOpacity
+  const backgroundOpacity: number | undefined = visuals.background.opacity
 
   if (visuals.background.type === 'gameplay') {
     visualStyle = 'gameplay'
