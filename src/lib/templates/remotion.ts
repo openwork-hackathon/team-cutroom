@@ -91,7 +91,7 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
   if (isDialog && voice.characters) {
     characters = voice.characters.map((char, i) => ({
       name: char.name,
-      spriteUrl: char.avatarUrl || `/characters/default-${i + 1}.png`,
+      spriteUrl: char.icon || `/characters/default-${i + 1}.png`,
       position: (i % 2 === 0 ? 'left' : 'right') as 'left' | 'right',
       color: char.color || (i % 2 === 0 ? '#ffd700' : '#90ee90'),
     }))
