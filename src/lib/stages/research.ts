@@ -80,16 +80,21 @@ Respond with ONLY valid JSON (no markdown, no explanation) in this exact structu
         researchData = getMockResearch(topic)
       }
 
+      // Enhance with web search sources when available
+      const webSources = await searchWeb(topic)
+      const sources: Source[] = [
+        ...webSources,
+        {
+          title: "AI-Generated Research",
+          url: `https://cutroom.ai/research/${encodeURIComponent(topic)}`,
+          snippet: `Research generated for: ${topic}`,
+        },
+      ]
+
       const output: ResearchOutput = {
         topic,
         facts: researchData.facts,
-        sources: [
-          {
-            title: "AI-Generated Research",
-            url: `https://cutroom.ai/research/${encodeURIComponent(topic)}`,
-            snippet: `Research generated for: ${topic}`,
-          },
-        ],
+        sources,
         hooks: researchData.hooks,
         targetAudience: researchData.targetAudience,
         estimatedDuration: researchData.estimatedDuration,
@@ -101,6 +106,8 @@ Respond with ONLY valid JSON (no markdown, no explanation) in this exact structu
         metadata: {
           promptUsed: researchPrompt,
           model: modelUsed,
+          webSearchUsed: webSources.length > 0,
+          sourceCount: sources.length,
         },
       }
     } catch (error) {
@@ -167,9 +174,42 @@ function getMockResearch(topic: string): z.infer<typeof LLMResearchResponseSchem
   }
 }
 
-// Helper to search web (to be implemented)
+// Brave Search API integration
+const BRAVE_SEARCH_API = "https://api.search.brave.com/res/v1/web/search"
+
 async function searchWeb(query: string): Promise<Source[]> {
-  // TODO: Implement web search
-  // Options: Brave Search API, Exa, SerpAPI
-  throw new Error("Web search not yet implemented")
+  const apiKey = process.env.BRAVE_SEARCH_API_KEY
+
+  if (!apiKey) {
+    return []
+  }
+
+  try {
+    const response = await fetch(
+      `${BRAVE_SEARCH_API}?q=${encodeURIComponent(query)}&count=5`,
+      {
+        headers: {
+          Accept: "application/json",
+          "X-Subscription-Token": apiKey,
+        },
+      }
+    )
+
+    if (!response.ok) {
+      console.warn(`Brave Search API error: ${response.status}`)
+      return []
+    }
+
+    const data = await response.json()
+    const results = data.web?.results || []
+
+    return results.map((result: { title: string; url: string; description: string }) => ({
+      title: result.title,
+      url: result.url,
+      snippet: result.description,
+    }))
+  } catch (error) {
+    console.warn("Web search failed:", (error as Error).message)
+    return []
+  }
 }

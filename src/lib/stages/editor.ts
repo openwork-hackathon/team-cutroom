@@ -102,7 +102,7 @@ export const editorStage: StageHandler = {
       // For MVP: Return mock video URL
       // In production: Actually render the video
       const videoUrl = await renderVideo(composition, context.pipelineId, templateProps)
-      const thumbnailUrl = await generateThumbnail(visual.clips[0]?.url, context.pipelineId)
+      const thumbnailUrl = await generateThumbnail(visual.clips[0]?.url, context.pipelineId, composition, templateProps)
 
       const renderTime = (Date.now() - startTime) / 1000
 
@@ -204,37 +204,129 @@ function generateComposition(
   }
 }
 
+function getCompositionId(templateProps?: RemotionTemplateProps): string {
+  if (!templateProps) return "CutroomVideo"
+  if (templateProps.isDialog) return "DialogExplainer"
+  if (templateProps.visualStyle === "gameplay") return "RedditMinecraft"
+  if (templateProps.visualStyle === "gradient") return "BedtimeStory"
+  return "TemplateVideo"
+}
+
+function buildInputProps(
+  composition: VideoComposition,
+  templateProps?: RemotionTemplateProps
+): Record<string, unknown> {
+  const overlays = composition.tracks.filter((t) => t.type === "overlay")
+  const voiceTrack = composition.tracks.find((t) => t.type === "audio")
+  const videoTracks = composition.tracks.filter((t) => t.type === "video")
+
+  return {
+    title: "Cutroom Video",
+    script: {
+      hook: overlays[0]?.source || "Welcome",
+      sections:
+        overlays.slice(1).map((t) => ({
+          heading: "",
+          content: t.source as string,
+          duration: t.duration,
+        })) || [],
+      cta: "Follow for more!",
+    },
+    voiceUrl: voiceTrack?.source,
+    clips: videoTracks.map((t) => ({
+      url: t.source,
+      startTime: t.startTime,
+      duration: t.duration,
+    })),
+    ...(templateProps && { template: templateProps }),
+  }
+}
+
 async function renderVideo(
-  composition: VideoComposition, 
+  composition: VideoComposition,
   pipelineId: string,
   templateProps?: RemotionTemplateProps
 ): Promise<string> {
-  // TODO: Implement actual video rendering
-  // Options:
-  // 1. Remotion (React-based video rendering)
-  // 2. FFmpeg via serverless function
-  // 3. External API like Shotstack, Creatomate
-  
-  // Determine composition ID based on template
-  let compositionId = 'CutroomVideo'
-  if (templateProps) {
-    if (templateProps.isDialog) {
-      compositionId = 'DialogExplainer'
-    } else if (templateProps.visualStyle === 'gameplay') {
-      compositionId = 'RedditMinecraft'
-    } else if (templateProps.visualStyle === 'gradient') {
-      compositionId = 'BedtimeStory'
-    } else {
-      compositionId = 'TemplateVideo'
-    }
+  const compositionId = getCompositionId(templateProps)
+
+  // Skip actual rendering in test environment
+  if (process.env.NODE_ENV === "test") {
+    return `https://placeholder.blob.vercel.com/video/${pipelineId}/${compositionId}/final.mp4`
   }
-  
-  // For MVP: Return placeholder URL with template info
-  return `https://placeholder.blob.vercel.com/video/${pipelineId}/${compositionId}/final.mp4`
+
+  try {
+    const { renderVideoToFile } = await import("@/lib/rendering")
+    const { uploadVideoBlob } = await import("@/lib/storage")
+    const path = await import("path")
+    const fs = await import("fs")
+
+    const inputProps = buildInputProps(composition, templateProps)
+    const fps = composition.format.fps || 30
+    const durationInFrames = Math.ceil(composition.duration * fps)
+
+    const tmpDir = path.resolve(process.cwd(), ".tmp")
+    const outputPath = path.join(tmpDir, `${pipelineId}-${Date.now()}.mp4`)
+
+    console.log(`Rendering video: composition=${compositionId}, duration=${composition.duration}s`)
+
+    await renderVideoToFile(compositionId, inputProps, durationInFrames, outputPath)
+
+    const buffer = fs.readFileSync(outputPath)
+    console.log(`Video rendered, size: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`)
+
+    const videoUrl = await uploadVideoBlob(buffer, pipelineId, compositionId)
+
+    // Clean up temp file
+    try {
+      fs.unlinkSync(outputPath)
+    } catch {
+      // Ignore cleanup errors
+    }
+
+    return videoUrl
+  } catch (error) {
+    console.error("Video rendering failed, using placeholder:", (error as Error).message)
+    return `https://placeholder.blob.vercel.com/video/${pipelineId}/${compositionId}/final.mp4`
+  }
 }
 
-async function generateThumbnail(clipUrl: string | undefined, pipelineId: string): Promise<string> {
-  // TODO: Extract frame from first clip
-  // For MVP: Return placeholder
-  return `https://placeholder.blob.vercel.com/video/${pipelineId}/thumbnail.jpg`
+async function generateThumbnail(
+  clipUrl: string | undefined,
+  pipelineId: string,
+  composition?: VideoComposition,
+  templateProps?: RemotionTemplateProps
+): Promise<string> {
+  // Skip actual rendering in test environment
+  if (process.env.NODE_ENV === "test" || !composition) {
+    return `https://placeholder.blob.vercel.com/video/${pipelineId}/thumbnail.jpg`
+  }
+
+  try {
+    const { renderThumbnailToFile } = await import("@/lib/rendering")
+    const { uploadThumbnailBlob } = await import("@/lib/storage")
+    const path = await import("path")
+    const fs = await import("fs")
+
+    const compositionId = getCompositionId(templateProps)
+    const inputProps = buildInputProps(composition, templateProps)
+
+    const tmpDir = path.resolve(process.cwd(), ".tmp")
+    const outputPath = path.join(tmpDir, `thumb-${pipelineId}-${Date.now()}.jpg`)
+
+    await renderThumbnailToFile(compositionId, inputProps, 30, outputPath)
+
+    const buffer = fs.readFileSync(outputPath)
+    const thumbnailUrl = await uploadThumbnailBlob(buffer, pipelineId)
+
+    try {
+      fs.unlinkSync(outputPath)
+    } catch {
+      // Ignore cleanup errors
+    }
+
+    return thumbnailUrl
+  } catch (error) {
+    console.error("Thumbnail generation failed, using placeholder:", (error as Error).message)
+    return `https://placeholder.blob.vercel.com/video/${pipelineId}/thumbnail.jpg`
+  }
 }

@@ -329,9 +329,8 @@ function estimateDuration(text: string): number {
 }
 
 async function uploadAudio(buffer: Buffer, pipelineId: string, stageId: string): Promise<string> {
-  const filename = `audio/${pipelineId}/${stageId}.mp3`
-  // TODO: Integrate with Vercel Blob
-  return `https://placeholder.blob.vercel.com/${filename}`
+  const { uploadAudioBlob } = await import("@/lib/storage")
+  return uploadAudioBlob(buffer, pipelineId, stageId)
 }
 
 function createMockOutput(text: string, estimatedDuration: number, reason: string = "ELEVENLABS_API_KEY not configured"): StageResult {

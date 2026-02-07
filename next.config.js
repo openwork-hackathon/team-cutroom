@@ -1,7 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client'],
+    serverComponentsExternalPackages: [
+      '@prisma/client',
+      '@remotion/bundler',
+      '@remotion/renderer',
+      '@remotion/cli',
+      'remotion',
+      'esbuild',
+    ],
   },
 }
 

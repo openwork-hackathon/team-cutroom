@@ -22,5 +22,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "remotion", "scripts", "examples"]
+  "exclude": ["node_modules", "remotion", "scripts", "examples", "team-cutroom"]
 }

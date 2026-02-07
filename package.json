@@ -29,6 +29,7 @@
     "@remotion/cli": "^4.0.416",
     "@remotion/renderer": "^4.0.416",
     "@tanstack/react-query": "^5.62.0",
+    "@vercel/blob": "^2.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",

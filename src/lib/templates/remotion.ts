@@ -1,6 +1,6 @@
 /**
  * Template to Remotion Props Converter
- * 
+ *
  * Converts Cutroom template configuration to Remotion TemplateVideo props.
  */
 
@@ -40,24 +40,25 @@ export interface RemotionTemplateProps {
  * Convert a VideoTemplate to Remotion-compatible props
  */
 export function templateToRemotionProps(template: VideoTemplate): RemotionTemplateProps {
-  const { voice, visuals, audio, layout, structure } = template
+  const { voice, visuals, layout, structure } = template
 
   // Determine visual style
   let visualStyle: RemotionTemplateProps['visualStyle'] = 'static'
   let backgroundColor: string | undefined
   let gradientColors: [string, string] | undefined
-  let backgroundOpacity: number | undefined = visuals.backgroundOpacity
+  const backgroundOpacity: number | undefined = visuals.background.opacity
 
   if (visuals.background.type === 'gameplay') {
     visualStyle = 'gameplay'
-  } else if (visuals.background.type === 'video') {
+  } else if (visuals.background.type === 'video' || visuals.background.type === 'broll') {
     visualStyle = 'broll'
-  } else if (visuals.background.type === 'image' || visuals.background.type === 'generated') {
+    backgroundColor = visuals.background.color
+  } else if (visuals.background.type === 'static') {
     visualStyle = 'static'
     backgroundColor = visuals.background.color
   } else if (visuals.background.type === 'gradient') {
     visualStyle = 'gradient'
-    gradientColors = visuals.background.colors as [string, string]
+    gradientColors = visuals.background.gradient
   }
 
   // Determine caption style
@@ -69,13 +70,24 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
   let captionFont: string | undefined
 
   if (layout.captions) {
-    captionStyle = layout.captions.style === 'bold' ? 'bold' :
-                   layout.captions.style === 'minimal' ? 'subtle' :
-                   layout.captions.style === 'karaoke' ? 'karaoke' : 'bold'
-    captionPosition = layout.captions.position
-    captionColor = layout.captions.textColor
-    captionStroke = layout.captions.strokeColor
-    captionFont = layout.captions.fontFamily
+    // style is a CaptionStyle object or undefined
+    const styleObj = layout.captions.style
+    if (styleObj) {
+      captionFont = styleObj.font
+      captionColor = styleObj.color
+      captionStroke = styleObj.stroke?.color
+    }
+
+    // Map caption position (OverlayPosition → simplified position)
+    const pos = layout.captions.position
+    if (pos === 'top' || pos === 'top-left' || pos === 'top-right') {
+      captionPosition = 'top'
+    } else if (pos === 'center' || pos === 'center-left' || pos === 'center-right') {
+      captionPosition = 'center'
+    } else {
+      captionPosition = 'bottom'
+    }
+
     captionAnimation = layout.captions.animation === 'word-by-word' ? 'word-by-word' :
                        layout.captions.animation === 'typewriter' ? 'typewriter' : 'fade'
   }
@@ -87,7 +99,7 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
   if (isDialog && voice.characters) {
     characters = voice.characters.map((char, i) => ({
       name: char.name,
-      spriteUrl: char.avatarUrl || `/characters/default-${i + 1}.png`,
+      spriteUrl: char.icon || `/characters/default-${i + 1}.png`,
       position: (i % 2 === 0 ? 'left' : 'right') as 'left' | 'right',
       color: char.color || (i % 2 === 0 ? '#ffd700' : '#90ee90'),
     }))
@@ -101,28 +113,32 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
   let ctaText: string | undefined
 
   if (layout.branding) {
-    watermarkUrl = layout.branding.watermarkUrl
-    watermarkPosition = layout.branding.watermarkPosition
-    showEndCard = layout.branding.showEndCard
-    ctaText = layout.branding.ctaStyle === 'text' && structure.cta?.text 
-      ? structure.cta.text 
+    watermarkUrl = layout.branding.watermark
+    // Map OverlayPosition to the four corners accepted by RemotionTemplateProps
+    const wp = layout.branding.watermarkPosition
+    if (wp === 'top-left' || wp === 'top-right' || wp === 'bottom-left' || wp === 'bottom-right') {
+      watermarkPosition = wp
+    }
+    showEndCard = layout.branding.endCard
+    ctaText = layout.branding.cta && structure.cta?.text
+      ? structure.cta.text
       : undefined
   }
 
   // Color grading
   let colorGrade: RemotionTemplateProps['colorGrade'] | undefined
-  if (visuals.colorGrading) {
+  if (visuals.colorGrade) {
     colorGrade = {
-      warmth: visuals.colorGrading.warmth,
-      saturation: visuals.colorGrading.saturation,
-      vignette: visuals.colorGrading.vignette,
+      warmth: visuals.colorGrade.warmth,
+      saturation: visuals.colorGrade.saturation,
+      vignette: visuals.colorGrade.vignette,
     }
   }
 
-  // Transition
-  const transition: RemotionTemplateProps['transition'] = 
-    visuals.transitions?.type === 'crossfade' ? 'crossfade' :
-    visuals.transitions?.type === 'swipe' ? 'swipe' : 'cut'
+  // Transition (TransitionStyle is a string enum)
+  const transition: RemotionTemplateProps['transition'] =
+    visuals.transitions === 'crossfade' ? 'crossfade' :
+    visuals.transitions === 'swipe' ? 'swipe' : 'cut'
 
   return {
     visualStyle,
@@ -151,14 +167,10 @@ export function templateToRemotionProps(template: VideoTemplate): RemotionTempla
  */
 export function getBackgroundUrl(visuals: VideoTemplate['visuals']): string | undefined {
   if (visuals.background.type === 'gameplay') {
-    // Return a placeholder - actual URL would be fetched from library
     return `/gameplay/${visuals.background.game}.mp4`
   }
-  if (visuals.background.type === 'video' && visuals.background.url) {
-    return visuals.background.url
-  }
-  if (visuals.background.type === 'image' && visuals.background.url) {
-    return visuals.background.url
+  if (visuals.background.type === 'video' && visuals.background.videoUrl) {
+    return visuals.background.videoUrl
   }
   return undefined
 }
@@ -174,6 +186,6 @@ export function calculateDurationInFrames(
   const sectionDuration = script.sections.reduce((sum, s) => sum + s.duration, 0)
   const introDuration = template.structure.pacing?.introDuration || 3
   const outroDuration = template.structure.pacing?.outroDuration || 3
-  
+
   return Math.ceil((sectionDuration + introDuration + outroDuration) * fps)
 }
